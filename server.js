@@ -18,6 +18,8 @@ const app = express();
 app.use(express.json());
 app.use(cors({
     origin: [
+        process.env.FRONTEND_USER_URL,
+        process.env.FRONTEND_ADMIN_URL,
         "http://localhost:3000",
         "http://localhost:3001",
         "http://localhost:3002"
