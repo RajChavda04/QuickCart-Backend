@@ -58,6 +58,18 @@ con.connect((err) => {
 
 
 // login api
+app.get("/api/health", (res)=>{
+
+  res.send ("Server is running")
+})
+
+app.all('*', (req, res) => {
+  res.status(404).json({
+    status: "fail",
+    message: `Can't find ${req.originalUrl} on the server`
+  });
+});
+
 
 app.post("/api/loginprocess",(req,resp)=>{
     var admin_email=req.body.admin_email;
