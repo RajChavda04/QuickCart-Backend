@@ -63,14 +63,6 @@ app.get("/api/health", (req, res) => {
   res.send("Server is running");
 });
 
-app.all('*', (req, res) => {
-  res.status(404).json({
-    status: "fail",
-    message: `Can't find ${req.originalUrl} on the server`
-  });
-});
-
-
 app.post("/api/loginprocess",(req,resp)=>{
     var admin_email=req.body.admin_email;
     var admin_password=req.body.admin_password;
@@ -1530,7 +1522,12 @@ app.get("/api/admin/order/:order_no", (req, res) => {
     });
 });
 
-
+app.all('*', (req, res) => {
+  res.status(404).json({
+    status: "fail",
+    message: `Can't find ${req.originalUrl} on the server`
+  });
+});
 
 app.listen(PORT, () => {
     console.log(`server is running on ${PORT}`);
