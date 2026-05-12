@@ -390,21 +390,21 @@ app.post("/api/userregister", (req, resp) => {
     const checkquery = "SELECT * FROM customer WHERE customer_email= ?";
     con.query(checkquery, [customer_email], (err, results) => {
         if (err) {
+            console.error("User register email check error:", err);
             return resp.status(500).send({ message: "Error checking email" });
         }
         if (results.length > 0) {
-            resp.send({ message: "Email already exists"});
-
-            //return resp.status(400).send({ message: "Email already exists" });
-        } else {
-            const query = "INSERT INTO customer(customer_name, customer_email, customer_password, customer_phone, customer_address) VALUES (?, ?, ?, ?, ?)";
-            con.query(query, [customer_name, customer_email, customer_password, customer_phone, customer_address], (err, result) => {
-                if (err) {
-                    return resp.status(500).send({ message: "Error in registration" });
-                }
-                resp.send({ message: "Registration successful", data: result });
-            });
+            return resp.status(400).send({ message: "User email already exists" });
         }
+
+        const query = "INSERT INTO customer(customer_name, customer_email, customer_password, customer_phone, customer_address, customer_status) VALUES (?, ?, ?, ?, ?, ?)";
+        con.query(query, [customer_name, customer_email, customer_password, customer_phone, customer_address, 0], (err, result) => {
+            if (err) {
+                console.error("User register insert error:", err);
+                return resp.status(500).send({ message: "Error in registration" });
+            }
+            resp.send({ message: "Registration successful", data: result });
+        });
     });
 });
 
@@ -854,21 +854,39 @@ app.post('/api/pay', (req, res) => {
                     }
                 });
 
-                const message = {
+                const customerMessage = {
                     from: process.env.Nodemailer_Email,
                     to: customer_email,
                     subject: "Order Confirmation - QuickCart",
                     text: `Hello ${customer_name},\n\nThank you for your order on QuickCart! Your order (Order No: ${order_no}) has been successfully placed.\n\nTotal Amount: ₹${total_amt}\nPayment Method: ${payment_method}\n\nWe’ll notify you once your order is shipped!\n\nRegards,\nTeam QuickCart`
                 };
 
-                smtpTransport.sendMail(message, (error, info) => {
+                const adminMessage = {
+                    from: process.env.Nodemailer_Email,
+                    to: process.env.Nodemailer_Email,
+                    subject: "New Order Received - QuickCart",
+                    text: `New order received from ${customer_name} (${customer_email}).\n\nOrder No: ${order_no}\nTotal Amount: ₹${total_amt}\nPayment Method: ${payment_method}\n\nShipping Address:\n${customer_address}\n${customer_city}, ${customer_state}, ${customer_country} - ${customer_pincode}`
+                };
+
+                smtpTransport.sendMail(customerMessage, (error, info) => {
                     if (error) {
-                        console.error("Mail send failed:", error);
-                        return res.send({ message: "Order placed successfully, but confirmation mail failed.", order_no });
+                        console.error("Customer mail send failed:", error);
                     } else {
-                        console.log("Confirmation mail sent:", info.response);
-                        return res.send({ message: "Order placed successfully and confirmation mail sent!", order_no });
+                        console.log("Customer confirmation mail sent:", info.response);
                     }
+
+                    smtpTransport.sendMail(adminMessage, (adminError, adminInfo) => {
+                        if (adminError) {
+                            console.error("Admin notification mail failed:", adminError);
+                        } else {
+                            console.log("Admin order notification sent:", adminInfo.response);
+                        }
+
+                        if (error) {
+                            return res.send({ message: "Order placed successfully, but customer confirmation mail failed.", order_no });
+                        }
+                        return res.send({ message: "Order placed successfully and confirmation mail sent!", order_no });
+                    });
                 });
             });
 
