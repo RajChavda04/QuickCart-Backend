@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+
+# env files
+.env
+.env.local
+
+# logs
+logs
+*.log
+npm-debug.log*
+
+# uploads/temp files
+uploads/
+tmp/
+
+# build files
+dist/
+build/
+
+# editor files
+.vscode/
+.idea/
+
+# system files
+.DS_Store
+Thumbs.db
