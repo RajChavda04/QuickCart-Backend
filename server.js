@@ -53,7 +53,7 @@ con.connect((err) => {
     if (err) {
         console.log("Database connection failed:", err);
     } else {
-        console.log("Connected to Aiven MySQL Database");
+        console.log("Connected to MySQL Database");
     }
 });
 
@@ -146,7 +146,6 @@ app.post("/api/passchangeuser",(req,resp)=>{
 });
 
 
-
 // add product with image from 
 const uploadDir = path.join(__dirname, './public/');
 if (!fs.existsSync(uploadDir)) {
@@ -223,11 +222,6 @@ app.post("/api/insertcategory", multi, (req, res) => {
     });
 });
 
-
-
-
-
-
 // get category in add product page
 
 app.get("/api/getcategory",(req,resp)=>{
@@ -236,7 +230,6 @@ app.get("/api/getcategory",(req,resp)=>{
         resp.send(result);
     });
 });
-
 
 //  edit category page api2
 
@@ -288,7 +281,6 @@ app.post('/api/categoryupdate1', multi, (req, res) => {
     });
 });
 
-
 // list category api
 
 app.get('/api/categorylist',(req,resp)=>{
@@ -312,7 +304,6 @@ app.delete('/api/Category_Delete/:category_id',(req,resp)=>{
 });
 
 // list product api
-
 app.get("/api/productlist",(req,resp)=>{
 
     const query="SELECT a.*,b.* FROM product_management as a,category as b where a.category_id = b.category_id";
@@ -322,7 +313,6 @@ app.get("/api/productlist",(req,resp)=>{
 });
 
 // product edit page api
-
 app.post('/api/editproductdata',(req,res) => {
     const product_id = req.body.product_id;
   
@@ -371,7 +361,6 @@ app.post('/api/productupdate', multi, (req, res) => {
     });
 });
 
-
 // delete product api
 app.delete('/api/Product_Delete/:product_id',(req,resp)=>{
     const {product_id}=req.params;
@@ -411,7 +400,6 @@ app.post("/api/userregister", (req, resp) => {
         });
     });
 });
-
 
 // User Login api
 
